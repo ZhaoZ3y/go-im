@@ -3,6 +3,7 @@ package dao
 import (
 	"fmt"
 	"goim/config"
+	"goim/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -27,10 +28,15 @@ func MysqlInit() {
 		panic(fmt.Errorf("Fatal error connect database: %s \n", err))
 	}
 
+	DB = db
 	sqlDB, _ := db.DB()
 
 	// 设置连接池
 	sqlDB.SetMaxIdleConns(20)
 	sqlDB.SetMaxOpenConns(100)
 
+	// 迁移
+	if err := db.AutoMigrate(&model.User{}); err != nil {
+		panic(fmt.Errorf("Fatal error migrate database: %s \n", err))
+	}
 }

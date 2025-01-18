@@ -1,7 +1,9 @@
 package dao
 
 import (
+	"errors"
 	"goim/model"
+	"gorm.io/gorm"
 )
 
 // IsExistedUser 判断用户是否存在
@@ -22,6 +24,29 @@ func IsExistedUser(username string) (bool, error) {
 
 // CreateUser 创建用户
 func CreateUser(user *model.User) error {
-	result := DB.Create(user)
-	return result.Error
+	err := DB.Create(user).Error
+	return err
+}
+
+// GetUserByUsername 获取用户信息
+func GetUserByUsername(username string) (*model.User, error) {
+	var user model.User
+	err := DB.Where("user_name = ?", username).First(&user).Error
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, errors.New("用户不存在")
+	} else if err != nil {
+		return nil, errors.New("查询用户失败")
+	}
+	return &user, nil
+}
+
+// CheckUser 核实账号密码
+func CheckUser(username, password string) (model.User, error) {
+	var user model.User
+	err := DB.Where("user_name = ? AND pass_word = ?", username, password).First(&user).Error
+	if err != nil {
+		return model.User{}, err
+	}
+
+	return user, nil
 }

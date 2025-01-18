@@ -5,5 +5,11 @@ mysql:
   port: 3306
   username: "root"
   password: "123456"
-  database: "chat_room"
+  database: "go_chat"
   tablePrefix: "chat_"
+
+redis:
+    host: "localhost"
+    port: 6379
+    password: ""
+    db: 0

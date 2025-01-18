@@ -8,6 +8,7 @@ import (
 type Config struct {
 	AppName string
 	MySQL   MySQLConfig
+	Redis   RedisConfig
 }
 
 type MySQLConfig struct {
@@ -19,6 +20,13 @@ type MySQLConfig struct {
 	TablePrefix string
 }
 
+type RedisConfig struct {
+	Host     string
+	Port     int
+	Password string
+	DB       int
+}
+
 var c Config
 
 func ConfigInit() {
@@ -27,7 +35,7 @@ func ConfigInit() {
 	//设置文件类型
 	viper.SetConfigType("yaml")
 	//设置文件路径
-	viper.AddConfigPath(".")
+	viper.AddConfigPath("../")
 	viper.AutomaticEnv()
 
 	err := viper.ReadInConfig()
