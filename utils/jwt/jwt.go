@@ -17,6 +17,7 @@ import (
 
 // Payload 载荷
 type Payload struct {
+	UserID    uint   `json:"UserID"`
 	UUid      string `json:"UUid"`
 	UserName  string `json:"UserName"`
 	Exp       int64  `json:"Exp"`
@@ -47,10 +48,9 @@ var blackList = struct {
 }
 
 // CreateToken 生成token结构体
-// CreateToken 生成token结构体
-func CreateToken(uuid, username string) (*Token, error) {
+func CreateToken(userID uint, uuid, username string) (*Token, error) {
 	// 生成 access token
-	accessToken, err := generateToken(uuid, username, TokenDuration, SecretKey, false)
+	accessToken, err := generateToken(userID, uuid, username, TokenDuration, SecretKey, false)
 	if err != nil {
 		return nil, fmt.Errorf("生成 access token 失败: %v", err)
 	}
@@ -59,7 +59,7 @@ func CreateToken(uuid, username string) (*Token, error) {
 	}
 
 	// 生成简短的 refresh token
-	refreshToken, err := generateToken(uuid, username, RefreshDuration, RefreshSecretKey, true)
+	refreshToken, err := generateToken(userID, uuid, username, RefreshDuration, RefreshSecretKey, true)
 	if err != nil {
 		return nil, fmt.Errorf("生成 refresh token 失败: %v", err)
 	}
@@ -81,13 +81,14 @@ func CreateToken(uuid, username string) (*Token, error) {
 }
 
 // generateToken 生成JWT token
-func generateToken(uuid, username string, duration time.Duration, secretKey string, isRefresh bool) (string, error) {
+func generateToken(userID uint, uuid, username string, duration time.Duration, secretKey string, isRefresh bool) (string, error) {
 	header := map[string]string{
 		"Alg": "HS256",
 		"Typ": "JWT",
 	}
 
 	payload := Payload{
+		UserID:    userID, // 添加 UserID 字段
 		UUid:      uuid + strconv.Itoa(rand.Intn(math.MaxInt)),
 		UserName:  username,
 		Exp:       time.Now().Add(duration).Unix(),
@@ -99,11 +100,13 @@ func generateToken(uuid, username string, duration time.Duration, secretKey stri
 	if isRefresh {
 		// 仅保留必要字段，减少token长度
 		payload = Payload{
-			UUid: uuid + strconv.Itoa(rand.Intn(math.MaxInt)), // 保留用户ID
-			Exp:  payload.Exp,                                 // 保留过期时间
+			UserID: userID,                                      // 保留用户ID
+			UUid:   uuid + strconv.Itoa(rand.Intn(math.MaxInt)), // 保留UUID
+			Exp:    payload.Exp,                                 // 保留过期时间
 		}
 	}
 
+	// 生成header和payload
 	headerJson, err := json.Marshal(header)
 	if err != nil {
 		return "", err
@@ -142,6 +145,7 @@ func ValidateToken(token string, isRefresh bool) (*Payload, error) {
 	}
 	blackList.RUnlock()
 
+	// 解析token
 	parts := strings.Split(token, ".")
 	if len(parts) != 3 {
 		return nil, errors.New("无效的令牌格式")
@@ -152,6 +156,7 @@ func ValidateToken(token string, isRefresh bool) (*Payload, error) {
 		return nil, errors.New("无效的签名")
 	}
 
+	// 解码payload
 	payloadJson, err := base64.RawURLEncoding.DecodeString(parts[1])
 	if err != nil {
 		return nil, fmt.Errorf("解码payload失败: %v", err)
@@ -162,6 +167,7 @@ func ValidateToken(token string, isRefresh bool) (*Payload, error) {
 		return nil, fmt.Errorf("解析claims失败: %v", err)
 	}
 
+	// 验证过期时间
 	if time.Now().Unix() > claims.Exp {
 		return nil, errors.New("令牌已过期")
 	}
@@ -176,5 +182,7 @@ func RefreshAccessToken(refreshToken string) (*Token, error) {
 	if err != nil {
 		return nil, fmt.Errorf("刷新令牌验证失败: %v", err)
 	}
-	return CreateToken(claims.UUid, claims.UserName)
+
+	// 使用 UserID 创建新的 access token
+	return CreateToken(claims.UserID, claims.UUid, claims.UserName)
 }

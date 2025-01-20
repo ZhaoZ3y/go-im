@@ -8,6 +8,7 @@ import (
 
 func RouterInit() {
 	r := gin.Default()
+	r.Use(middleware.Cors())
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
@@ -29,5 +30,12 @@ func RouterInit() {
 		user.GET("/search", api.SearchUserAPI)
 		user.PUT("/changePassword", api.ChangePasswordAPI)
 	}
+
+	group := r.Group("/group")
+	group.Use(middleware.JwtMiddleware())
+	{
+		group.GET("/list", api.GetGroupAPI)
+	}
+
 	r.Run(":8080")
 }

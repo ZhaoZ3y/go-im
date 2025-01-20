@@ -1,6 +1,7 @@
 package model_json
 
 type User struct {
+	ID       int64  `json:"id"`
 	Uuid     string `json:"uuid"`
 	UserName string `json:"username"`
 	NickName string `json:"nickname"`

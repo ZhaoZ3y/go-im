@@ -8,6 +8,7 @@ type Group struct {
 	UserID    uint   `gorm:"index:idx_groups_user_id;" comment:"群主ID"`
 	Notice    string `gorm:"type:text;default null" comment:"群公告"`
 	Uuid      string `gorm:"type:varchar(150);uniqueIndex:idx_uuid;not null" comment:"群唯一标识"`
+	Avatar    string `gorm:"type:varchar(255);default null" comment:"群头像"`
 }
 
 func (g *Group) TableName() string {

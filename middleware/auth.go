@@ -1,10 +1,9 @@
 package middleware
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"goim/utils/jwt"
-	"net/http"
+	response "goim/utils/responses"
 	"strings"
 )
 
@@ -14,7 +13,7 @@ func JwtMiddleware() gin.HandlerFunc {
 		// 获取请求中的Authorization头部
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is required"})
+			response.AuthNeed(c)
 			c.Abort() // 请求被中断
 			return
 		}
@@ -22,7 +21,7 @@ func JwtMiddleware() gin.HandlerFunc {
 		// Authorization头部格式为: "Bearer <token>"
 		authParts := strings.Split(authHeader, " ")
 		if len(authParts) != 2 || authParts[0] != "Bearer" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid Authorization format"})
+			response.AuthHeaderErr(c)
 			c.Abort() // 请求被中断
 			return
 		}
@@ -33,13 +32,14 @@ func JwtMiddleware() gin.HandlerFunc {
 		// 验证Token，假设我们正在验证access token
 		payload, err := jwt.ValidateToken(token, false) // 如果是刷新令牌，传true
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": fmt.Sprintf("Token validation failed: %v", err)})
+			response.AuthFail(c)
 			c.Abort() // 请求被中断
 			return
 		}
 
 		// 将解析出来的用户信息附加到上下文中，供下游使用
 		c.Set("username", payload.UserName) // Gin的上下文传递数据，后续处理中可以通过c.Get("user")获取
+		c.Set("user_id", payload.UserID)
 
 		// 继续处理
 		c.Next()

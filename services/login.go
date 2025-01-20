@@ -43,12 +43,12 @@ func Register(user model.User) error {
 
 // Login 登录
 func Login(username, password string) (token *jwt.Token, err error) {
-	User, err := Verify(username, password)
+	User, Id, err := Verify(username, password)
 	if err != nil {
 		return nil, errors.New("账号或密码错误")
 	}
 
-	token, err = jwt.CreateToken(User.Uuid, User.UserName)
+	token, err = jwt.CreateToken(Id, User.Uuid, User.UserName)
 	if err != nil {
 		return nil, errors.New("生成 token 失败")
 	}
@@ -56,17 +56,17 @@ func Login(username, password string) (token *jwt.Token, err error) {
 }
 
 // Verify 核实账号密码
-func Verify(username, password string) (user model.User, err error) {
-	_, err = dao.GetUserByUsername(username)
+func Verify(username, password string) (user model.User, Id uint, err error) {
+	U, err := dao.GetUserByUsername(username)
 	if err != nil {
-		return model.User{}, errors.New("用户不存在")
+		return model.User{}, 0, errors.New("用户不存在")
 	}
 
 	// 密码加密
 	HashPassword := crypto.CryptoPwd(password)
 	User, err := dao.CheckUser(username, HashPassword)
 	if err != nil {
-		return model.User{}, errors.New("账号或密码错误")
+		return model.User{}, 0, errors.New("账号或密码错误")
 	}
 
 	user = model.User{
@@ -78,7 +78,7 @@ func Verify(username, password string) (user model.User, err error) {
 		NickName: User.NickName,
 	}
 
-	return user, nil
+	return user, U.ID, nil
 }
 
 // RefreshToken 刷新token

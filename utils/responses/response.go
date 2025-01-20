@@ -58,6 +58,24 @@ var (
 		Status: 50002,
 		Info:   "该令牌在5分钟内已被刷新，无法再次刷新",
 	}
+
+	// AuthFailed 鉴权失败
+	AuthFailed = Response{
+		Status: 40001,
+		Info:   "Auth Failed",
+	}
+
+	// AuthHeaderNotFound 未找到Auth头
+	AuthHeaderNotFound = Response{
+		Status: 40002,
+		Info:   "Auth Header Not Found",
+	}
+
+	// AuthNeeded 需要鉴权
+	AuthNeeded = Response{
+		Status: 40003,
+		Info:   "Auth Needed",
+	}
 )
 
 func Success(ctx *gin.Context) {
@@ -98,4 +116,16 @@ func TokenExpiredErr(ctx *gin.Context) {
 
 func TokenHasRefresh(ctx *gin.Context) {
 	ctx.JSON(http.StatusUnauthorized, TokenHasRefreshed)
+}
+
+func AuthNeed(ctx *gin.Context) {
+	ctx.JSON(http.StatusUnauthorized, AuthNeeded)
+}
+
+func AuthFail(ctx *gin.Context) {
+	ctx.JSON(http.StatusUnauthorized, AuthFailed)
+}
+
+func AuthHeaderErr(ctx *gin.Context) {
+	ctx.JSON(http.StatusUnauthorized, AuthHeaderNotFound)
 }

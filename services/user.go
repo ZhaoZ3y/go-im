@@ -25,6 +25,7 @@ func GetUserByUsername(username string) (model_json.User, error) {
 	}
 
 	userJson := model_json.User{
+		ID:       int64(user.ID),
 		Uuid:     user.Uuid,
 		UserName: user.UserName,
 		NickName: user.NickName,
@@ -45,6 +46,7 @@ func SearchUser(username string) ([]model_json.User, error) {
 	var usersJson []model_json.User
 	for _, user := range users {
 		userJson := model_json.User{
+			ID:       int64(user.ID),
 			Uuid:     user.Uuid,
 			UserName: user.UserName,
 			NickName: user.NickName,
