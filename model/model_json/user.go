@@ -5,15 +5,10 @@ type User struct {
 	UserName string `json:"username"`
 	NickName string `json:"nickname"`
 	Email    string `json:"email"`
-	PassWord string `json:"password"`
 	Avatar   string `json:"avatar"`
 }
 
-type LoginReq struct {
-	UserName string `json:"username"`
-	PassWord string `json:"password"`
-}
-
-type RefreshTokenReq struct {
-	RefreshToken string `json:"refresh_token"`
+type ChangePasswordReq struct {
+	OldPassword string `json:"old_password"`
+	NewPassword string `json:"new_password"`
 }

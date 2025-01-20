@@ -3,14 +3,13 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"goim/model"
-
 	"goim/model/model_json"
 	"goim/services"
 	response "goim/utils/responses"
 )
 
-// RegisterAPI 注册
-func RegisterAPI(ctx *gin.Context) {
+// UpdateUserAPI 更新用户信息
+func UpdateUserAPI(ctx *gin.Context) {
 	var user model_json.User
 	err := ctx.ShouldBindJSON(&user)
 	if err != nil {
@@ -18,20 +17,17 @@ func RegisterAPI(ctx *gin.Context) {
 		return
 	}
 
+	username := ctx.GetString("username")
+
 	User := model.User{
-		UserName: user.UserName,
+		UserName: username,
 		NickName: user.NickName,
 		Email:    user.Email,
-		PassWord: user.PassWord,
 		Avatar:   user.Avatar,
 	}
 
-	err = services.Register(User)
+	err = services.UpdateUser(username, User)
 	if err != nil {
-		if err.Error() == services.UserExisted {
-			response.UserHasExist(ctx)
-			return
-		}
 		response.InternalErr(ctx)
 		return
 	}
@@ -39,46 +35,45 @@ func RegisterAPI(ctx *gin.Context) {
 	response.Success(ctx)
 }
 
-// LoginAPI 登录
-func LoginAPI(ctx *gin.Context) {
-	var LoginReq model_json.LoginReq
-	err := ctx.ShouldBindJSON(&LoginReq)
+// GetUserAPI 获取用户信息
+func GetUserAPI(ctx *gin.Context) {
+	username := ctx.GetString("username")
+	user, err := services.GetUserByUsername(username)
 	if err != nil {
-		response.ParamErr(ctx)
-		return
-	}
-
-	token, err := services.Login(LoginReq.UserName, LoginReq.PassWord)
-	if err != nil {
-		if err.Error() == services.UserLoginErr {
-			response.UsernameOfPasswordErr(ctx)
-			return
-		}
 		response.InternalErr(ctx)
 		return
 	}
 
-	response.OKWithData(ctx, token)
+	response.OKWithData(ctx, user)
 }
 
-// RefreshTokenAPI 刷新token
-func RefreshTokenAPI(ctx *gin.Context) {
-	var refreshToken model_json.RefreshTokenReq
-	err := ctx.ShouldBindJSON(&refreshToken)
+// SearchUserAPI 搜索用户
+func SearchUserAPI(ctx *gin.Context) {
+	username := ctx.Query("username")
+	users, err := services.SearchUser(username)
+	if err != nil {
+		response.InternalErr(ctx)
+		return
+	}
+
+	response.OKWithData(ctx, users)
+}
+
+// ChangePasswordAPI 修改密码
+func ChangePasswordAPI(ctx *gin.Context) {
+	var changePassword model_json.ChangePasswordReq
+	err := ctx.ShouldBindJSON(&changePassword)
 	if err != nil {
 		response.ParamErr(ctx)
 		return
 	}
 
-	NewToken, err := services.RefreshToken(refreshToken.RefreshToken)
+	username := ctx.GetString("username")
+	err = services.ChangePassword(username, changePassword.OldPassword, changePassword.NewPassword)
 	if err != nil {
-		if err.Error() == services.RefreshFailed {
-			response.TokenHasRefresh(ctx)
-			return
-		}
 		response.InternalErr(ctx)
 		return
 	}
 
-	response.OKWithData(ctx, NewToken)
+	response.Success(ctx)
 }

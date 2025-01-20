@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	"goim/api"
+	"goim/middleware"
 )
 
 func RouterInit() {
@@ -13,11 +14,20 @@ func RouterInit() {
 		})
 	})
 
-	user := r.Group("/user")
+	r.POST("/register", api.RegisterAPI)
+	login := r.Group("/login")
 	{
-		user.POST("/register", api.RegisterAPI)
-		user.POST("/login", api.LoginAPI)
-		user.POST("/refresh", api.RefreshTokenAPI)
+		login.POST("", api.LoginAPI)
+		login.POST("/refresh", api.RefreshTokenAPI)
+	}
+
+	user := r.Group("/user")
+	user.Use(middleware.JwtMiddleware())
+	{
+		user.PUT("/update", api.UpdateUserAPI)
+		user.GET("/info", api.GetUserAPI)
+		user.GET("/search", api.SearchUserAPI)
+		user.PUT("/changePassword", api.ChangePasswordAPI)
 	}
 	r.Run(":8080")
 }

@@ -50,3 +50,23 @@ func CheckUser(username, password string) (model.User, error) {
 
 	return user, nil
 }
+
+// UpdateUser 更新用户信息
+func UpdateUser(username string, user model.User) error {
+	return DB.Model(&user).Where("user_name = ?", username).Updates(user).Error
+}
+
+// SearchUser 搜索用户
+func SearchUser(username string) ([]model.User, error) {
+	var users []model.User
+	err := DB.Model(model.User{}).Where("user_name LIKE ?", "%"+username+"%").Find(&users).Error
+	if err != nil {
+		return nil, errors.New("查询用户失败")
+	}
+	return users, nil
+}
+
+// ChangePassword 修改密码
+func ChangePassword(username, password string) error {
+	return DB.Model(&model.User{}).Where("user_name = ?", username).Update("pass_word", password).Error
+}

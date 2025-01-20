@@ -14,7 +14,7 @@ var (
 	// Ok 成功
 	Ok = Response{
 		Status: 10000,
-		Info:   "OK",
+		Info:   "Success",
 	}
 
 	// ParamError 参数错误
