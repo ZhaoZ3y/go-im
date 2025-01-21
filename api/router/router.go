@@ -15,6 +15,7 @@ func RouterInit() {
 		})
 	})
 
+	//用户登录注册API
 	r.POST("/register", api.RegisterAPI)
 	login := r.Group("/login")
 	{
@@ -22,6 +23,7 @@ func RouterInit() {
 		login.POST("/refresh", api.RefreshTokenAPI)
 	}
 
+	//用户信息API
 	user := r.Group("/user")
 	user.Use(middleware.JwtMiddleware())
 	{
@@ -31,10 +33,14 @@ func RouterInit() {
 		user.PUT("/changePassword", api.ChangePasswordAPI)
 	}
 
+	//群组相关API
 	group := r.Group("/group")
 	group.Use(middleware.JwtMiddleware())
 	{
 		group.GET("/list", api.GetGroupAPI)
+		group.POST("/create", api.CreateGroupAPI)
+		group.GET("/members", api.GetGroupMembersAPI)
+		group.POST("/join", api.JoinGroupAPI)
 	}
 
 	r.Run(":8080")

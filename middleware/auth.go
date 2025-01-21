@@ -3,7 +3,7 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"goim/utils/jwt"
-	response "goim/utils/responses"
+	response "goim/utils/response"
 	"strings"
 )
 

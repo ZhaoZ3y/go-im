@@ -5,7 +5,7 @@ import (
 	"goim/model"
 	"goim/model/model_json"
 	"goim/services"
-	response "goim/utils/responses"
+	"goim/utils/response"
 )
 
 // RegisterAPI 注册
