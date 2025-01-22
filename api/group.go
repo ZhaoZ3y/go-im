@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"goim/model/model_json"
 	"goim/services"
+	constant "goim/utils/const"
 	"goim/utils/response"
 	"strconv"
 )
@@ -67,6 +68,10 @@ func JoinGroupAPI(ctx *gin.Context) {
 
 	err := services.JoinGroup(username, groupUuid)
 	if err != nil {
+		if err.Error() == constant.UserExisted {
+			response.UserHasJoined(ctx)
+			return
+		}
 		response.InternalErr(ctx)
 		return
 	}

@@ -5,6 +5,7 @@ import (
 	"goim/model"
 	"goim/model/model_json"
 	"goim/services"
+	constant "goim/utils/const"
 	"goim/utils/response"
 )
 
@@ -19,7 +20,7 @@ func RegisterAPI(ctx *gin.Context) {
 
 	err = services.Register(user)
 	if err != nil {
-		if err.Error() == services.UserExisted {
+		if err.Error() == constant.UserExisted {
 			response.UserHasExist(ctx)
 			return
 		}
@@ -41,7 +42,7 @@ func LoginAPI(ctx *gin.Context) {
 
 	token, err := services.Login(LoginReq.UserName, LoginReq.PassWord)
 	if err != nil {
-		if err.Error() == services.UserLoginErr {
+		if err.Error() == constant.UserLoginErr {
 			response.UsernameOfPasswordErr(ctx)
 			return
 		}
@@ -63,7 +64,7 @@ func RefreshTokenAPI(ctx *gin.Context) {
 
 	NewToken, err := services.RefreshToken(refreshToken.RefreshToken)
 	if err != nil {
-		if err.Error() == services.RefreshFailed {
+		if err.Error() == constant.RefreshFailed {
 			response.TokenHasRefresh(ctx)
 			return
 		}

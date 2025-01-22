@@ -58,6 +58,9 @@ func GetGroupMembers(groupId uint) ([]model.GroupMember, error) {
 func JoinGroup(username string, groupUuid string) error {
 	err := dao.JoinGroup(username, groupUuid)
 	if err != nil {
+		if err.Error() == "用户已在群组中，不能重复加入" {
+			return errors.New("用户已存在")
+		}
 		return errors.New("加入群组失败")
 	}
 	return nil

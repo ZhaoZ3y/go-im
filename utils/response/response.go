@@ -23,12 +23,6 @@ var (
 		Info:   "Param Error",
 	}
 
-	// VerifyFailed 鉴权认证失败
-	VerifyFailed = Response{
-		Status: 20002,
-		Info:   "Very Failed",
-	}
-
 	// UsernameOfPasswordError 登录时账号密码错误
 	UsernameOfPasswordError = Response{
 		Status: 20003,
@@ -76,6 +70,12 @@ var (
 		Status: 40003,
 		Info:   "Auth Needed",
 	}
+
+	// UserHasJoinGroup 用户已经加入群组
+	UserHasJoinGroup = Response{
+		Status: 20005,
+		Info:   "用户已经加入群组",
+	}
 )
 
 func Success(ctx *gin.Context) {
@@ -92,10 +92,6 @@ func OKWithData(ctx *gin.Context, data interface{}) {
 
 func ParamErr(ctx *gin.Context) {
 	ctx.JSON(http.StatusBadRequest, ParamError)
-}
-
-func VerifyErr(ctx *gin.Context) {
-	ctx.JSON(http.StatusForbidden, VerifyFailed)
 }
 
 func InternalErr(ctx *gin.Context) {
@@ -128,4 +124,8 @@ func AuthFail(ctx *gin.Context) {
 
 func AuthHeaderErr(ctx *gin.Context) {
 	ctx.JSON(http.StatusUnauthorized, AuthHeaderNotFound)
+}
+
+func UserHasJoined(ctx *gin.Context) {
+	ctx.JSON(http.StatusUnauthorized, UserHasJoinGroup)
 }

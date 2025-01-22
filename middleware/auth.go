@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
+	constant "goim/utils/const"
 	"goim/utils/jwt"
 	response "goim/utils/response"
 	"strings"
@@ -32,6 +33,9 @@ func JwtMiddleware() gin.HandlerFunc {
 		// 验证Token，假设我们正在验证access token
 		payload, err := jwt.ValidateToken(token, false) // 如果是刷新令牌，传true
 		if err != nil {
+			if err.Error() == constant.TokenExpired {
+				response.TokenExpiredErr(c)
+			}
 			response.AuthFail(c)
 			c.Abort() // 请求被中断
 			return

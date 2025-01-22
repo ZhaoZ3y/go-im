@@ -71,18 +71,13 @@ func JoinGroup(username string, groupUuid string) error {
 		return errors.New("群组不存在")
 	}
 
-	Group := model.Group{
-		UserID:    User.ID,
-		Uuid:      groupUuid,
-		GroupName: group.GroupName,
-		Notice:    group.Notice,
-		Avatar:    group.Avatar,
-	}
-
-	// 创建群组
-	err = DB.Model(&model.Group{}).Create(&Group).Error
-	if err != nil {
-		return errors.New("加入群组失败")
+	// 检查用户是否已经在群组中
+	var existingMember model.GroupMember
+	err = DB.Model(&model.GroupMember{}).
+		Where("group_id = ? AND user_id = ?", group.ID, User.ID).
+		First(&existingMember).Error
+	if err == nil {
+		return errors.New("用户已在群组中，不能重复加入")
 	}
 
 	// 创建群组成员记录
