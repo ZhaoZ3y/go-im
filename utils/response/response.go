@@ -76,6 +76,18 @@ var (
 		Status: 20005,
 		Info:   "用户已经加入群组",
 	}
+
+	// GroupNotExist 群组不存在
+	GroupNotExist = Response{
+		Status: 20006,
+		Info:   "群组不存在",
+	}
+
+	// FriendExisted 已经是好友了
+	FriendExisted = Response{
+		Status: 20007,
+		Info:   "已经是好友了",
+	}
 )
 
 func Success(ctx *gin.Context) {
@@ -128,4 +140,12 @@ func AuthHeaderErr(ctx *gin.Context) {
 
 func UserHasJoined(ctx *gin.Context) {
 	ctx.JSON(http.StatusUnauthorized, UserHasJoinGroup)
+}
+
+func GroupNOTExisted(ctx *gin.Context) {
+	ctx.JSON(http.StatusUnauthorized, GroupNotExist)
+}
+
+func FriendHasExisted(ctx *gin.Context) {
+	ctx.JSON(http.StatusUnauthorized, FriendExisted)
 }

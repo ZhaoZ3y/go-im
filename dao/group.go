@@ -47,9 +47,15 @@ func CreateGroup(username string, group model.Group) error {
 }
 
 // GetGroupMembers 获取群成员
-func GetGroupMembers(groupId uint) ([]model.GroupMember, error) {
+func GetGroupMembers(groupUuId string) ([]model.GroupMember, error) {
+	var group model.Group
+	err := DB.Model(&model.Group{}).Where("uuid = ?", groupUuId).First(&group).Error
+	if err != nil {
+		return nil, errors.New("群组不存在")
+	}
+
 	var members []model.GroupMember
-	err := DB.Model(&model.GroupMember{}).Where("group_id = ?", groupId).Find(&members).Error
+	err = DB.Model(&model.GroupMember{}).Where("group_id = ?", group.ID).Find(&members).Error
 	if err != nil {
 		return nil, errors.New("查询群成员失败")
 	}
@@ -69,6 +75,14 @@ func JoinGroup(username string, groupUuid string) error {
 	err = DB.Model(&model.Group{}).Where("uuid = ?", groupUuid).First(&group).Error
 	if err != nil || group.ID <= 0 {
 		return errors.New("群组不存在")
+	}
+
+	Group := model.Group{
+		UserID:    User.ID,
+		Uuid:      groupUuid,
+		GroupName: group.GroupName,
+		Notice:    group.Notice,
+		Avatar:    group.Avatar,
 	}
 
 	// 检查用户是否已经在群组中
@@ -92,8 +106,43 @@ func JoinGroup(username string, groupUuid string) error {
 
 	// 插入群组成员记录
 	err = DB.Model(&model.GroupMember{}).Create(&groupMember).Error
+	err = DB.Model(&model.Group{}).Create(&Group).Error
 	if err != nil {
 		return errors.New("加入群组失败")
+	}
+
+	return nil
+}
+
+// QuitGroup 用户退出群组
+func QuitGroup(username string, groupUuid string) error {
+	// 获取用户信息
+	User, err := GetUserByUsername(username)
+	if err != nil {
+		return errors.New("用户不存在")
+	}
+
+	// 查找群组
+	var group model.Group
+	err = DB.Model(&model.Group{}).Where("uuid = ?", groupUuid).First(&group).Error
+	if err != nil || group.ID <= 0 {
+		return errors.New("群组不存在")
+	}
+
+	// 删除群组成员记录
+	err = DB.Model(&model.GroupMember{}).
+		Where("group_id = ? AND user_id = ?", group.ID, User.ID).
+		Delete(&model.GroupMember{}).Error
+	if err != nil {
+		return errors.New("退出群组失败")
+	}
+
+	// 删除群组记录
+	err = DB.Model(&model.Group{}).
+		Where("uuid = ? And user_id = ?", groupUuid, User.ID).
+		Delete(&model.Group{}).Error
+	if err != nil {
+		return errors.New("退出群组失败")
 	}
 
 	return nil

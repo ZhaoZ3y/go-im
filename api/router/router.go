@@ -41,6 +41,16 @@ func RouterInit() {
 		group.POST("/create", api.CreateGroupAPI)
 		group.GET("/members", api.GetGroupMembersAPI)
 		group.POST("/join", api.JoinGroupAPI)
+		group.DELETE("/quit", api.ExitGroupAPI)
+	}
+
+	//好友相关API
+	friend := r.Group("/friend")
+	friend.Use(middleware.JwtMiddleware())
+	{
+		friend.GET("/list", api.GetFriendListAPI)
+		friend.POST("/add", api.AddFriendAPI)
+		friend.DELETE("/delete", api.DeleteFriendAPI)
 	}
 
 	r.Run(":8080")

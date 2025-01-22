@@ -5,6 +5,7 @@ import (
 	"goim/dao"
 	"goim/model"
 	"goim/model/model_json"
+	"sort"
 )
 
 // GetGroup 获取用户群组`
@@ -27,6 +28,11 @@ func GetGroup(userId uint) ([]model_json.Group, error) {
 		groupsJson = append(groupsJson, groupJson)
 	}
 
+	// 按照name的首字母从小到大排序
+	sort.Slice(groupsJson, func(i, j int) bool {
+		return groupsJson[i].Name < groupsJson[j].Name
+	})
+
 	return groupsJson, nil
 }
 
@@ -46,8 +52,8 @@ func CreateGroup(username string, group model_json.Group) error {
 }
 
 // GetGroupMembers 获取群成员
-func GetGroupMembers(groupId uint) ([]model.GroupMember, error) {
-	members, err := dao.GetGroupMembers(groupId)
+func GetGroupMembers(groupUuId string) ([]model.GroupMember, error) {
+	members, err := dao.GetGroupMembers(groupUuId)
 	if err != nil {
 		return nil, errors.New("查询群成员失败")
 	}
@@ -62,6 +68,18 @@ func JoinGroup(username string, groupUuid string) error {
 			return errors.New("用户已存在")
 		}
 		return errors.New("加入群组失败")
+	}
+	return nil
+}
+
+// QuitGroup 退出群组
+func QuitGroup(username string, groupUuid string) error {
+	err := dao.QuitGroup(username, groupUuid)
+	if err != nil {
+		if err.Error() == "群组不存在" {
+			return errors.New("群组不存在")
+		}
+		return errors.New("退出群组失败")
 	}
 	return nil
 }
