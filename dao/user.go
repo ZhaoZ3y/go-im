@@ -70,3 +70,15 @@ func SearchUser(username string) ([]model.User, error) {
 func ChangePassword(username, password string) error {
 	return DB.Model(&model.User{}).Where("user_name = ?", username).Update("pass_word", password).Error
 }
+
+// GetUserByUuid 通过 uuid 获取用户信息
+func GetUserByUuid(uuid string) (*model.User, error) {
+	var user model.User
+	err := DB.Where("uuid = ?", uuid).First(&user).Error
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, errors.New("用户不存在")
+	} else if err != nil {
+		return nil, errors.New("查询用户失败")
+	}
+	return &user, nil
+}

@@ -31,6 +31,7 @@ func RouterInit() {
 		user.GET("/info", api.GetUserAPI)
 		user.GET("/search", api.SearchUserAPI)
 		user.PUT("/changePassword", api.ChangePasswordAPI)
+		user.GET("/detail", api.GetUserInfoAPI)
 	}
 
 	//群组相关API
@@ -51,6 +52,13 @@ func RouterInit() {
 		friend.GET("/list", api.GetFriendListAPI)
 		friend.POST("/add", api.AddFriendAPI)
 		friend.DELETE("/delete", api.DeleteFriendAPI)
+	}
+
+	//消息相关API
+	message := r.Group("/message")
+	message.Use(middleware.JwtMiddleware())
+	{
+		message.GET("", api.GetMessages)
 	}
 
 	r.Run(":8080")

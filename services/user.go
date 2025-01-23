@@ -75,3 +75,21 @@ func ChangePassword(username string, oldPassword string, newPassword string) err
 	return nil
 
 }
+
+// GetUserByUserName 根据用户名获取用户信息
+func GetUserByUserName(username string) (model_json.User, error) {
+	user, err := dao.GetUserByUsername(username)
+	if err != nil {
+		return model_json.User{}, errors.New("查询用户失败")
+	}
+
+	var userJson model_json.User
+	userJson.ID = int64(user.ID)
+	userJson.Uuid = user.Uuid
+	userJson.UserName = user.UserName
+	userJson.NickName = user.NickName
+	userJson.Email = user.Email
+	userJson.Avatar = user.Avatar
+
+	return userJson, nil
+}

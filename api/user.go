@@ -77,3 +77,15 @@ func ChangePasswordAPI(ctx *gin.Context) {
 
 	response.Success(ctx)
 }
+
+// GetUserInfoAPI 获取用户信息
+func GetUserInfoAPI(ctx *gin.Context) {
+	username := ctx.Query("username")
+	user, err := services.GetUserByUsername(username)
+	if err != nil {
+		response.InternalErr(ctx)
+		return
+	}
+
+	response.OKWithData(ctx, user)
+}

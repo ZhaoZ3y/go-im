@@ -13,3 +13,11 @@ redis:
     port: 6379
     password: ""
     db: 0
+
+msgChannelType:
+  channelType : "gochannel"
+  kafkaHost: "kafka:9092"
+  kafkaTopic: "chat_room"
+
+staticPath:
+  filePath : "web/static/file/"

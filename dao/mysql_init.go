@@ -36,7 +36,7 @@ func MysqlInit() {
 	sqlDB.SetMaxOpenConns(100)
 
 	// 迁移
-	if err := db.AutoMigrate(&model.User{}, &model.UserFriend{}, &model.Group{}, &model.GroupMember{}); err != nil {
+	if err := db.AutoMigrate(&model.User{}, &model.UserFriend{}, &model.Group{}, &model.GroupMember{}, &model.Message{}); err != nil {
 		panic(fmt.Errorf("Fatal error migrate database: %s \n", err))
 	}
 }

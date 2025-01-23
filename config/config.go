@@ -6,9 +6,11 @@ import (
 )
 
 type Config struct {
-	AppName string
-	MySQL   MySQLConfig
-	Redis   RedisConfig
+	AppName    string
+	MySQL      MySQLConfig
+	Redis      RedisConfig
+	Path       PathConfig
+	MsgChannel MsgChannelConfig
 }
 
 type MySQLConfig struct {
@@ -25,6 +27,16 @@ type RedisConfig struct {
 	Port     int
 	Password string
 	DB       int
+}
+
+type PathConfig struct {
+	FilePath string
+}
+
+type MsgChannelConfig struct {
+	ChannelType string
+	KafkaHost   string
+	KafkaTopic  string
 }
 
 var c Config
