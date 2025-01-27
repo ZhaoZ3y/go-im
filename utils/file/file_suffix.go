@@ -1,8 +1,9 @@
-package utilspackage
+package file
 
 import (
 	"bytes"
 	"encoding/hex"
+	"github.com/wxnacy/wgo/arrays"
 	constant "goim/utils/const"
 	"strconv"
 	"strings"

@@ -19,6 +19,7 @@ type GroupMember struct {
 	gorm.Model
 	GroupID  uint   `gorm:"index:idx_group_members_group_id;" comment:"群ID"`
 	UserID   uint   `gorm:"index:idx_group_members_user_id;" comment:"用户ID"`
+	UserUuid string `gorm:"type:varchar(150);not null" comment:"用户唯一标识"`
 	NickName string `gorm:"type:varchar(255);not null" comment:"昵称"`
 	Avatar   string `gorm:"type:varchar(255);default null" comment:"头像"`
 	Mute     int    `gorm:"type:smallint;default 0" comment:"是否禁言：0否，1是"`

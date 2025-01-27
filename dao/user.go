@@ -82,3 +82,8 @@ func GetUserByUuid(uuid string) (*model.User, error) {
 	}
 	return &user, nil
 }
+
+// ChangeAvatar 修改头像
+func ChangeAvatar(username, avatar string) error {
+	return DB.Model(&model.User{}).Where("user_name = ?", username).Update("avatar", avatar).Error
+}

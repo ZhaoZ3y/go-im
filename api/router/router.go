@@ -6,7 +6,7 @@ import (
 	"goim/middleware"
 )
 
-func RouterInit() {
+func RouterInit() *gin.Engine {
 	r := gin.Default()
 	r.Use(middleware.Cors())
 	r.GET("/ping", func(c *gin.Context) {
@@ -14,6 +14,9 @@ func RouterInit() {
 			"message": "pong",
 		})
 	})
+
+	socket := RunSocket
+	r.GET("/ws", socket)
 
 	//用户登录注册API
 	r.POST("/register", api.RegisterAPI)
@@ -61,5 +64,13 @@ func RouterInit() {
 		message.GET("", api.GetMessages)
 	}
 
-	r.Run(":8080")
+	//文件相关API
+	file := r.Group("/file")
+	file.Use(middleware.JwtMiddleware())
+	{
+		file.GET("/:fileName", api.GetFileAPI)
+		file.POST("", api.UploadFileAPI)
+	}
+
+	return r
 }

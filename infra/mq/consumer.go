@@ -24,7 +24,7 @@ func InitConsumer(hosts string) {
 }
 
 // ConsumerMessage 消费消息
-func ConsumerMessage(topic string, callback ConsumerCallback) {
+func ConsumerMessage(callback ConsumerCallback) {
 	PartitionConsumer, err := consumer.ConsumePartition(topic, 0, sarama.OffsetNewest)
 	if err != nil {
 		panic(err)

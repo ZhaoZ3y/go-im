@@ -13,6 +13,7 @@ type Config struct {
 	MsgChannel MsgChannelConfig
 }
 
+// MySQLConfig mysql配置
 type MySQLConfig struct {
 	Host        string
 	Port        int
@@ -22,6 +23,7 @@ type MySQLConfig struct {
 	TablePrefix string
 }
 
+// RedisConfig redis配置
 type RedisConfig struct {
 	Host     string
 	Port     int
@@ -29,10 +31,12 @@ type RedisConfig struct {
 	DB       int
 }
 
+// PathConfig 文件路径配置
 type PathConfig struct {
 	FilePath string
 }
 
+// MsgChannelConfig 消息通道配置
 type MsgChannelConfig struct {
 	ChannelType string
 	KafkaHost   string
@@ -47,7 +51,7 @@ func ConfigInit() {
 	//设置文件类型
 	viper.SetConfigType("yaml")
 	//设置文件路径
-	viper.AddConfigPath("../")
+	viper.AddConfigPath(".")
 	viper.AutomaticEnv()
 
 	err := viper.ReadInConfig()

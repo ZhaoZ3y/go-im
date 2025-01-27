@@ -33,6 +33,7 @@ func CreateGroup(username string, group model.Group) error {
 	groupMember := model.GroupMember{
 		GroupID:  group.ID,
 		UserID:   User.ID,
+		UserUuid: User.Uuid,
 		NickName: User.NickName,
 		Avatar:   User.Avatar,
 		Mute:     0,
@@ -98,6 +99,7 @@ func JoinGroup(username string, groupUuid string) error {
 	groupMember := model.GroupMember{
 		GroupID:  group.ID,
 		UserID:   User.ID,
+		UserUuid: User.Uuid,
 		NickName: User.NickName,
 		Avatar:   User.Avatar,
 		Mute:     0,
