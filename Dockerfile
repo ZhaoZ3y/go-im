@@ -14,20 +14,15 @@ RUN go mod download && go mod verify
 # 复制源码到构建镜像
 COPY . .
 
-# 编译项目
-RUN go build -v -o /opt/gochat/server
+# 编译项目（指定 main.go 路径）
+RUN go build -v -o /opt/gochat/server ./cmd
 
-# 使用 Busybox 作为运行时镜像
 FROM busybox
 
-# 复制构建好的可执行文件到最终镜像
 COPY --from=builder /opt/gochat/server /opt/gochat/server
 
-# 复制配置文件
-COPY ../../config.toml /opt/gochat/config.toml
+COPY ./config.yaml /opt/gochat/config.yaml
 
-# 设置工作目录
 WORKDIR /opt/gochat
 
-# 设置容器启动时执行的命令
 CMD ["./server"]

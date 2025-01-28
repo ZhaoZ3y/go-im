@@ -1,67 +1,77 @@
 package config
 
 import (
-	"fmt"
-	"github.com/spf13/viper"
+	"github.com/kr/pretty"
+	"gopkg.in/validator.v2"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
+	"sync"
 )
 
+var (
+	conf *Config
+	once sync.Once
+)
+
+// Config 配置结构体
 type Config struct {
-	AppName    string
-	MySQL      MySQLConfig
-	Redis      RedisConfig
-	Path       PathConfig
-	MsgChannel MsgChannelConfig
+	AppName    string           `yaml:"appName"`
+	MySQL      MySQLConfig      `yaml:"mysql"`
+	Redis      RedisConfig      `yaml:"redis"`
+	Path       PathConfig       `yaml:"path"`
+	MsgChannel MsgChannelConfig `yaml:"msgChannel"`
 }
 
-// MySQLConfig mysql配置
+// MySQLConfig MySQL 配置
 type MySQLConfig struct {
-	Host        string
-	Port        int
-	Username    string
-	Password    string
-	Database    string
-	TablePrefix string
+	Host        string `yaml:"host"`
+	Port        int    `yaml:"port"`
+	Username    string `yaml:"username"`
+	Password    string `yaml:"password"`
+	Database    string `yaml:"database"`
+	TablePrefix string `yaml:"table_prefix"`
 }
 
 // RedisConfig redis配置
 type RedisConfig struct {
-	Host     string
-	Port     int
-	Password string
-	DB       int
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
+	Password string `yaml:"password"`
+	DB       int    `yaml:"db"`
 }
 
 // PathConfig 文件路径配置
 type PathConfig struct {
-	FilePath string
+	FilePath string `yaml:"filePath"`
 }
 
 // MsgChannelConfig 消息通道配置
 type MsgChannelConfig struct {
-	ChannelType string
-	KafkaHost   string
-	KafkaTopic  string
+	ChannelType string `yaml:"channelType"`
+	KafkaHost   string `yaml:"kafkaHost"`
+	KafkaTopic  string `yaml:"kafkaTopic"`
 }
-
-var c Config
 
 func ConfigInit() {
-	//设置文件名
-	viper.SetConfigName("config")
-	//设置文件类型
-	viper.SetConfigType("yaml")
-	//设置文件路径
-	viper.AddConfigPath(".")
-	viper.AutomaticEnv()
-
-	err := viper.ReadInConfig()
+	// 在工作目录下查找 config.yaml
+	confFileRelPath := "config.yaml"
+	content, err := ioutil.ReadFile(confFileRelPath)
 	if err != nil {
-		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		panic(err)
 	}
-
-	viper.Unmarshal(&c)
+	conf = new(Config)
+	err = yaml.Unmarshal(content, conf)
+	if err != nil {
+		panic(err)
+	}
+	if err := validator.Validate(conf); err != nil {
+		panic(err)
+	}
+	pretty.Printf("%+v\n", conf)
 }
 
-func GetConfig() Config {
-	return c
+// GetConfig 获取配置实例
+func GetConfig() *Config {
+	once.Do(ConfigInit)
+	return conf
 }

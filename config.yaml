@@ -1,7 +1,7 @@
-appName: "chat_room"
+appName: "gochat"
 
 mysql:
-  host: "localhost"
+  host: mysql
   port: 3306
   username: "root"
   password: "123456"
@@ -9,15 +9,15 @@ mysql:
   tablePrefix: "chat_"
 
 redis:
-    host: "localhost"
+    host: mysql
     port: 6379
     password: ""
     db: 0
 
-msgChannelType:
+msgChannel:
   channelType : "gochannel"
   kafkaHost: "kafka:9092"
   kafkaTopic: "chat_room"
 
-staticPath:
+path:
   filePath : "web/static/file/"

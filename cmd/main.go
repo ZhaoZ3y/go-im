@@ -13,7 +13,6 @@ import (
 )
 
 func main() {
-	config.ConfigInit()
 	if config.GetConfig().MsgChannel.ChannelType == constant.KAFKA {
 		mq.InitProducer(config.GetConfig().MsgChannel.KafkaTopic, config.GetConfig().MsgChannel.KafkaHost)
 		mq.InitConsumer(config.GetConfig().MsgChannel.KafkaHost)
